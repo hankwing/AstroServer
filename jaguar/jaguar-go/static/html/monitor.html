@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <title>光变曲线异常监控</title>
+    <script src="/js/echarts.min.js"></script>
+</head>
+
+<body bgcolor="#2c343c" style="font-family: Microsoft YaHei">
+    <div id="first">
+        <script type="text/javascript">
+            var firstContainer = document.getElementById('first');
+
+            firstContainer.style.width = window.innerWidth + 'px';
+            firstContainer.style.height = window.innerHeight * 0.5 + 'px';
+        </script>
+
+        <div id="chart1"></div>
+        <script type="text/javascript">
+            //先在数据数组里放一个数，不然会有bug
+            var data1 = [0];
+
+            var chart1Container = document.getElementById('chart1');
+
+            chart1Container.style.width = document.getElementById('first').clientWidth * 0.8 + 'px';
+            chart1Container.style.height = document.getElementById('first').clientHeight + 'px';
+            chart1Container.style.cssFloat = "left";
+
+            // 基于准备好的dom，初始化echarts图表
+            var myChart1 = echarts.init(chart1Container);
+
+            option1 = {
+                title: {
+                    text: '异常度最高星体星等曲线',
+                    textStyle: {
+                        color: "#fff"
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['星等值'],
+                    height: chart1Container.style.height,
+                    width: chart1Container.style.width
+                },
+                grid: {
+                    left: 30,
+                    top: 80,
+                },
+                toolbox: {
+                    show: false,
+                    feature: {
+                        mark: { show: true },
+                        dataView: { show: true, readOnly: false },
+                        magicType: { show: true, type: ['line', 'bar'] },
+                        restore: { show: true },
+                        saveAsImage: { show: true }
+                    }
+                },
+                calculable: true,
+                xAxis: [
+                    {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: data1,
+                        axisLine: { lineStyle: { color: '#8392A5' } },
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value',
+                        silent: 'true',
+                        inverse: true,
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        axisLine: { lineStyle: { color: '#8392A5' } },
+                    }
+                ],
+                series: [
+                    {
+                        name: '星等值',
+                        type: 'line',
+                        smooth: false,
+                        itemStyle: {
+                            normal: {
+                                color: '#eec566',
+                                lineStyle: {
+                                    color: '#eec566'
+                                }
+                            }
+                        },
+                        data: data1
+                    },
+                ]
+            };
+
+            // 为echarts对象加载数据 
+            myChart1.setOption(option1);
+        </script>
+
+        <div id="text1">
+            <p style="color: white">星体编号：<span id="firstStarNum" style="color: #eec566"></span></p>
+
+            <div id="algoNameList1">
+                <p style="color: #fff">算法名称</p>
+                <ul id="algoNameList1List" style="list-style:none; margin:0px; padding:0px">
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                </ul>
+                <p style="padding-top:15px; color: #fff">最终判定结果：</p>
+            </div>
+
+            <div id="result1">
+                <p style="color: white; margin-top: 25px">结果</p>
+                <ul id="result1List" style="list-style:none; margin:0px; padding:0px">
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                </ul>
+                <p id="final_result1" style="padding-top:15px; font-weight:bold"></p>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var text1Container = document.getElementById('text1');
+            text1Container.style.width = document.getElementById('first').clientWidth * 0.15 + 'px';
+            text1Container.style.height = document.getElementById('first').clientHeight + 'px';
+            text1Container.style.cssFloat = "left";
+
+            var algoNameList1Container = document.getElementById('algoNameList1');
+            algoNameList1Container.style.width = text1Container.style.width * 0.5 + 'px';
+            algoNameList1Container.style.height = text1Container.style.height * 0.8 + 'px';
+            algoNameList1Container.style.cssFloat = "left";
+            algoNameList1Container.style.textAlign = "left";
+
+            var result1Container = document.getElementById('result1');
+            result1Container.style.width = text1Container.style.width * 0.5 + 'px';
+            result1Container.style.height = text1Container.style.height * 0.8 + 'px';
+            result1Container.style.cssFloat = "right";
+            result1Container.style.textAlign = "right";
+        </script>
+    </div>
+
+    <div id="second">
+        <script type="text/javascript">
+            var secondContainer = document.getElementById('second');
+
+            secondContainer.style.width = window.innerWidth + 'px';
+            secondContainer.style.height = window.innerHeight * 0.5 + 'px';
+        </script>
+
+        <div id="chart2"></div>
+        <script type="text/javascript">
+            var data2 = [0];
+
+            var chart2Container = document.getElementById('chart2');
+
+            chart2Container.style.width = document.getElementById('second').clientWidth * 0.8 + 'px';
+            chart2Container.style.height = document.getElementById('second').clientHeight + 'px';
+            chart2Container.style.cssFloat = "left";
+
+            // 基于准备好的dom，初始化echarts图表
+            var myChart2 = echarts.init(chart2Container);
+
+            option2 = {
+                title: {
+                    text: '异常度次高星体星等曲线',
+                    textStyle: {
+                        color: "#fff"
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['星等值'],
+                    height: chart2Container.style.height,
+                    width: chart2Container.style.width
+                },
+                grid: {
+                    left: 30,
+                    top: 80,
+                },
+                toolbox: {
+                    show: false,
+                    feature: {
+                        mark: { show: true },
+                        dataView: { show: true, readOnly: false },
+                        magicType: { show: true, type: ['line', 'bar'] },
+                        restore: { show: true },
+                        saveAsImage: { show: true }
+                    }
+                },
+                calculable: true,
+                xAxis: [
+                    {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: data2,
+                        axisLine: { lineStyle: { color: '#8392A5' } },
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value',
+                        silent: 'true',
+                        inverse: true,
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        axisLine: { lineStyle: { color: '#8392A5' } },
+                    }
+                ],
+                series: [{
+                    name: '星等值',
+                    type: 'line',
+                    smooth: false,
+                    itemStyle: {
+                        normal: {
+                            color: '#eec566',
+                            lineStyle: {
+                                color: '#eec566'
+                            }
+                        }
+                    },
+                    data: data2
+                }]
+            };
+
+            // 为echarts对象加载数据 
+            myChart2.setOption(option2);
+        </script>
+
+        <div id="text2">
+            <p style="color: #fff">星体编号：<span id="secondStarNum" style="color: #eec566"></span></p>
+
+            <div id="algoNameList2">
+                <p style="color: #fff">算法名称</p>
+                <ul id="algoNameList2List" style="list-style:none; margin:0px; padding:0px">
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                </ul>
+                <p style="padding-top:15px; color: #fff">最终判定结果：</p>
+            </div>
+
+            <div id="result2">
+                <p style="color: #fff; margin-top: 25px">结果</p>
+                <ul id="result2List" style="list-style:none; margin:0px; padding:0px">
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                    <li style="padding-top:10px; color:#ddd"></li>
+                </ul>
+                <p id="final_result2" style="padding-top:15px; font-weight:bold"></p>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var text2Container = document.getElementById('text2');
+
+            text2Container.style.width = document.getElementById('second').clientWidth * 0.15 + 'px';
+            text2Container.style.height = document.getElementById('second').clientHeight + 'px';
+            text2Container.style.cssFloat = "left";
+
+            var algoNameList2Container = document.getElementById('algoNameList2');
+            algoNameList2Container.style.width = text2Container.style.width * 0.5 + 'px';
+            algoNameList2Container.style.height = text2Container.style.height * 0.8 + 'px';
+            algoNameList2Container.style.cssFloat = "left";
+            algoNameList2Container.style.textAlign = "left";
+
+            var result2Container = document.getElementById('result2');
+            result2Container.style.width = text2Container.style.width * 0.5 + 'px';
+            result2Container.style.height = text2Container.style.height * 0.8 + 'px';
+            result2Container.style.cssFloat = "right";
+            result2Container.style.textAlign = "right";
+        </script>
+    </div>
+
+    <script type="text/javascript">
+            //注册异步加载函数
+            setInterval(function () {
+                var xhr = new XMLHttpRequest();
+                xhr.open('get', '/ajax', true);
+                xhr.send();
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4) {
+                        if (xhr.status == 200) {
+                            //将json字符串转换为json结构体
+                            ajaxStruct = eval('(' + xhr.responseText + ')');
+
+                            var firstStarNum = document.getElementById('firstStarNum');
+                            firstStarNum.innerHTML = ajaxStruct.FirstStarId;
+                            var secondStarNum = document.getElementById('secondStarNum');
+                            secondStarNum.innerHTML = ajaxStruct.SecondStarId;
+
+                            var algoNameList1List = document.getElementById("algoNameList1List");
+                            var result1List = document.getElementById('result1List');
+                            var final_result1 = document.getElementById('final_result1');
+
+                            var algoNameList2List = document.getElementById("algoNameList2List");
+                            var result2List = document.getElementById('result2List');
+                            var final_result2 = document.getElementById('final_result2');
+
+                            var curr = 0;
+                            for (var algoName = algoNameList1List.firstElementChild; algoName != null; algoName = algoName.nextElementSibling) {
+                                if (curr >= ajaxStruct.AlgoNameList.length) {
+                                    break;
+                                }
+                                algoName.innerHTML = ajaxStruct.AlgoNameList[curr];
+                                algoName.color = "#fff";
+                                curr++;
+                            }
+
+                            curr = 0;
+                            for (var algoName = algoNameList2List.firstElementChild; algoName != null; algoName = algoName.nextElementSibling) {
+                                if (curr >= ajaxStruct.AlgoNameList.length) {
+                                    break;
+                                }
+                                algoName.innerHTML = ajaxStruct.AlgoNameList[curr];
+                                algoName.color = "#fff";
+                                curr++;
+                            }
+
+                            final_result1.innerHTML = '正常';
+                            final_result1.style.color = 'green';
+
+                            curr = 0;
+                            for (var result = result1List.firstElementChild; result != null; result = result.nextElementSibling) {
+                                if (curr >= ajaxStruct.FirstAnomalousList.length) {
+                                    break;
+                                }
+                                if (ajaxStruct.FirstAnomalousList[curr]) {
+                                    result.innerHTML = '异常';
+                                    result.style.color = '#eec566';
+                                    final_result1.innerHTML = '异常';
+                                    final_result1.style.color = '#eec566';
+                                } else {
+                                    result.innerHTML = '正常';
+                                    result.style.color = 'green';
+                                }
+                                curr++;
+                            }
+
+                            final_result2.innerHTML = '正常';
+                            final_result2.style.color = 'green';
+
+                            curr = 0;
+                            for (var result = result2List.firstElementChild; result != null; result = result.nextElementSibling) {
+                                if (curr >= ajaxStruct.SecondAnomalousList.length) {
+                                    break;
+                                }
+                                if (ajaxStruct.SecondAnomalousList[curr]) {
+                                    result.innerHTML = '异常';
+                                    result.style.color = '#eec566';
+                                    final_result2.innerHTML = '异常';
+                                    final_result2.style.color = '#eec566';
+                                } else {
+                                    result.innerHTML = '正常';
+                                    result.style.color = 'green';
+                                }
+                                curr++;
+                            }
+
+                            var average1 = 0;
+                            var average2 = 0;
+                            for (var i = 0; i < ajaxStruct.FirstList.length; i++) {
+                                average1 = average1 + ajaxStruct.FirstList[i];
+                                average2 = average2 + ajaxStruct.SecondList[i];
+                            }
+                            average1 = average1 / ajaxStruct.FirstList.length;
+                            average2 = average2 / ajaxStruct.SecondList.length;
+
+                            var variance1 = 0;
+                            var variance2 = 0;
+                            for (var i = 0; i < ajaxStruct.FirstList.length; i++) {
+                                variance1 = variance1 + (ajaxStruct.FirstList[i] - average1) * (ajaxStruct.FirstList[i] - average1);
+                                variance2 = variance2 + (ajaxStruct.SecondList[i] - average2) * (ajaxStruct.SecondList[i] - average2);
+                            }
+                            variance1 = variance1 / ajaxStruct.FirstList.length;
+                            variance2 = variance2 / ajaxStruct.SecondList.length;
+
+                            var flagwindow1 = [];
+                            var start1 = "";
+                            var end1 = "";
+                            var button1 = false;
+                            for (var i = 0; i < ajaxStruct.FirstFlagList.length; i++) {
+                                if (ajaxStruct.FirstFlagList[i] == true) { //异常结束
+                                    if (button1 == true) {
+                                        if (i == ajaxStruct.FirstFlagList.length - 1) {
+                                            button1 = false;
+                                            end1 = ajaxStruct.TimeList[i];
+                                            flagwindow1.push([{
+                                                xAxis: start1
+                                            }, {
+                                                xAxis: end1
+                                            }]);
+                                        }
+                                    } else { //异常开始
+                                        start1 = ajaxStruct.TimeList[i];
+                                        button1 = true;
+                                    }
+                                } else {
+                                    if (button1 == true) { //异常结束
+                                        button1 = false;
+                                        end1 = ajaxStruct.TimeList[i - 1];
+                                        flagwindow1.push([{
+                                            xAxis: start1
+                                        }, {
+                                            xAxis: end1
+                                        }]);
+                                    }
+                                }
+                            }
+
+
+                            var flagwindow2 = [];
+                            var start2 = "";
+                            var end2 = "";
+                            var button2 = false;
+                            for (var i = 0; i < ajaxStruct.SecondFlagList.length; i++) {
+                                if (ajaxStruct.SecondFlagList[i] == true) { //异常结束
+                                    if (button2 == true) {
+                                        if (i == ajaxStruct.SecondFlagList.length - 1) {
+                                            button2 = false;
+                                            end2 = ajaxStruct.TimeList[i];
+                                            flagwindow2.push([{
+                                                xAxis: start2
+                                            }, {
+                                                xAxis: end2
+                                            }]);
+                                        }
+                                    } else { //异常开始
+                                        start2 = ajaxStruct.TimeList[i];
+                                        button2 = true;
+                                    }
+                                } else {
+                                    if (button2 == true) { //异常结束
+                                        button2 = false;
+                                        end2 = ajaxStruct.TimeList[i - 1];
+                                        flagwindow2.push([{
+                                            xAxis: start2
+                                        }, {
+                                            xAxis: end2
+                                        }]);
+                                    }
+                                }
+                            }
+
+
+                            myChart1.setOption({
+                                title: {
+                                    subtext: '编号：' + ajaxStruct.FirstStarId + '                 最近40个样本均值：' + average1 + '                 最近40个样本方差：' + variance1
+                                },
+                                xAxis: {
+                                    type: 'category',
+                                    data: ajaxStruct.TimeList,
+                                    axisLine: { lineStyle: { color: '#8392A5' } }
+                                },
+                                series: [{
+                                    data: ajaxStruct.FirstList,
+                                    markArea: {
+                                        silent: true,
+                                        itemStyle: {
+                                            normal: {
+                                                color: 'rgba(128, 0, 0, 0.5)'
+                                            }
+                                        },
+                                        data: flagwindow1
+                                    }
+                                }]
+                            });
+
+                            myChart2.setOption({
+                                title: {
+                                    subtext: '编号：' + ajaxStruct.SecondStarId + '                 最近40个样本均值：' + average2 + '                 最近40个样本方差：' + variance2
+                                },
+                                xAxis: {
+                                    data: ajaxStruct.TimeList
+                                },
+                                series: [{
+                                    data: ajaxStruct.SecondList,
+                                    markArea: {
+                                        silent: true,
+                                        itemStyle: {
+                                            normal: {
+                                                color: 'rgba(128, 0, 0, 0.5)'
+                                            }
+                                        },
+                                        data: flagwindow2
+                                    }
+                                }]
+                            });
+                        }
+                    }
+                }
+            }, 2500);
+    </script>
+</body>

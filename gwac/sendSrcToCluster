@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for(( worker = 69; worker < 88; worker++)) 
+do
+	scp /home/wamdm/gwac/gwac_dbgen/init_imageid.txt 10.0.83.$worker:~/gwac/gwac_dbgen/
+done

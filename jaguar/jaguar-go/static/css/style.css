@@ -1,0 +1,167 @@
+*{
+	margin:0px;
+	box-sizing: border-box;
+}
+html,body{
+	height:100%;
+}
+
+a{
+	color: #fff;
+}
+
+.form-control{
+	width: 170px !important;
+}
+.main-panel{
+	position: absolute;
+	top: 6.5%;
+	height: 89.5%;
+	width: 100%;
+}
+
+.left-panel{
+	width: 20%;
+	height: 100%;
+	position: absolute;
+	border-right: 1px solid #325C80 !important;
+	background: radial-gradient(#264A60, #1D3649);
+}
+
+.center-panel{
+	position: absolute;
+	width: 60%;
+	height: 100%;
+	left: 20%;
+	background: radial-gradient(#152935, #010205);
+}
+
+.right-panel{
+	position: absolute;
+	width: 20%;
+	height: 100%;
+	left: 80%;
+	border-left: 1px solid #325C80;
+	background: radial-gradient(#264A60, #1D3649);
+}
+
+.bottom-panel{
+	padding: 5px 15px;
+	width: 100%;
+	height: 4%;
+	position: absolute;
+	border-top: 1px solid #325C80;
+	top: 96%;
+	color: #fff;
+	background: linear-gradient(#152935, #010205);
+}
+
+.navbar{
+	background: linear-gradient(#1D3649, #152935);
+  border-bottom: 1px solid #325C80;
+  height: 6.5%;
+}
+
+.navbar-inverse .navbar-brand {
+  color: #fff;
+}
+
+.panel{
+	border-width: 0px;
+	border-radius: 0px; 
+	color: #fff;
+	background: linear-gradient(#264A60, #1D3649);
+}
+.panel-heading,
+.nav-tabs{
+	border-bottom: 1px solid #325C80 !important;
+  background: linear-gradient(#152935, #010205);
+  color: #fff !important;
+}
+
+.nav-tabs > li.active > a, 
+.nav-tabs > li.active > a:hover, 
+.nav-tabs > li.active > a:focus,
+.nav > li > a:hover,
+.nav > li > a:focus{
+	color: #fff;
+	background: radial-gradient(#264A60, #1D3649);
+	border: 1px solid #fff;
+	border-bottom: 0px;
+}
+
+table{
+	background: linear-gradient(#264A60, #1D3649);
+	box-shadow: 0px 0px 5px;
+}
+td,th{
+	border-color: #325C80 !important;
+}
+
+#main{
+	height: 800px;
+	width: 100%;
+	overflow:hidden;
+	position: relative;
+}
+#stats{
+	position: absolute;
+}
+
+.starry-sky {
+	height: 500px;
+}
+
+.starry-info {
+	height: 430px;
+}
+
+.light-curve {
+	height: 420px;
+  border: 0px solid #fff;
+  border-radius: 0px;
+  background: radial-gradient(#264A60, #1D3649);
+}
+
+svg,
+canvas {
+  position: absolute;
+}
+
+.radio{
+	display: inline-block;
+}
+
+#map{
+	position: absolute;
+	height: 98%;
+	width: 100%;
+/*	background: #05143c;*/
+	background: radial-gradient(#152935, #010205)
+}
+
+#map .domain,
+#map .axis line,
+#map .axis text{
+	fill: #eee;
+	stroke: #eee;
+	shape-rendering: crispEdges
+}
+
+#light{
+	background: transparent;
+	box-shadow: 0px 0px 5px;
+}
+
+#light .domain,
+#light .axis line,
+#light .axis text{
+	fill: none;
+	stroke: #ccc;
+	stroke-width: 1px;
+	shape-rendering: crispEdges
+}
+
+#light .axis text{
+	stroke: #999;
+}

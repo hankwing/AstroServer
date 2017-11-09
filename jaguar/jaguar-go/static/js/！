@@ -1,0 +1,329 @@
+// 初始化
+scatter.callbackMap({ 'click': showStarDetail });
+
+// 初始化加载数据
+loadData().then(redrawEquatorial);// 初始渲染的是赤道坐标系
+
+// 持续渲染
+render();
+// ---------------------------------------------------------
+
+function typePoint(d) {
+  return {
+    x_pix: +d.XPix,
+    y_pix: +d.YPix,
+    ra: +d.Ra,
+    dec: +d.Dec,
+    zone: +d.Zone,
+    star_id: d.StarId,
+    mag: +d.Mag,
+    timestamp: +d.Timestamp,
+    ellipticity: +d.Ellipticity,
+    ccd_num: +d.CcdNum
+  }
+}
+
+// 加载数据
+function loadData() {
+  var p = new Promise(function (resolve, reject) {
+    // d3.queue()
+    // //.defer(d3.csv, "../data/star.csv")
+    // .defer(d3.csv, "../data/home.csv/part-00000", typePoint)
+    // .defer(d3.csv, "../data/home.csv/part-00001", typePoint)
+    // .defer(d3.csv, "../data/home.csv/part-00002", typePoint)
+    // // .defer(d3.csv, "../data/home.csv/part-00003")
+    // // .defer(d3.csv, "../data/home.csv/part-00004")
+    // // .defer(d3.csv, "../data/home.csv/part-00005")
+    // // .defer(d3.csv, "../data/home.csv/part-00006")
+    // // .defer(d3.csv, "../data/home.csv/part-00007")
+    // .await(function ready(){
+    //   if(arguments.length < 2) throw "未加载数据";
+    //   points = [].slice.call(arguments,1).reduce(function(p,c){ return p.concat(c); });
+    //   resolve();
+    // });
+
+    // 加载字体
+    var loader = new THREE.FontLoader();
+    loader.load('../fonts/helvetiker_regular.typeface.json', function (font) {
+      text_options.font = font;
+      resolve();
+    });
+
+  });
+
+  return p;
+}
+
+// 检索
+function searchById(self) {
+  var val = $("#search").val();
+  if (curCoordType == 2) scatter.searchById(val);
+  else if (curCoordType == 1 || curCoordType == 3) {
+    var INTERSECTED = -1;
+    var searched = points.filter(function (f, i) {
+      return INTERSECTED = i, f.star_id == val;
+    });
+
+    // TODO 自动旋转
+    var attributes = pointsSystem.geometry.attributes;
+    attributes.size.array[INTERSECTED] = attributes.size.array[INTERSECTED] == 30 ? 3 : 30;
+    var color = new THREE.Color();
+    color.setHSL(Math.PI, .99, .46);
+    color.toArray(attributes.customColor.array, INTERSECTED * 3);
+
+    attributes.size.needsUpdate = true;
+    attributes.customColor.needsUpdate = true;
+    showStarDetail(searched[0]);
+  }
+}
+
+// 绘制策略
+function draw(self, type) {
+  // 当前active
+  $(".nav-tabs li").removeClass('active');
+  $(self).closest('li').addClass('active');
+  closePolling();
+  if (type == 1) redrawEquatorial();// 赤道坐标系
+  else if (type == 2) redrawCartesian2();// 二维笛卡尔坐标系
+}
+
+// 重绘赤道坐标系
+function redrawEquatorial() {
+  curCoordType = 1;
+  $(".radio-group").hide();
+  d3.select('#map').html('');
+  // 清除重绘
+  utils.delete3DOBJ('earthGroup', scene);
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x000000, earthRadius * 1.5, earthRadius * 10);
+
+  earthGroup = new THREE.Object3D();
+  earthGroup.name = 'earthGroup';
+  // utils.addEarth(earthGroup,earthRadius,"../images/earth.jpg");
+
+  // 点二维数组
+  var shell = utils.getShell(earthRadius * 3, 72, 72);
+  earthGroup.add(shell);
+  scene.add(earthGroup);
+
+  // 绘制点
+  // drawEquatorialPoints(points, earthGroup);
+  startPolling('3d');
+  document.querySelector("#map").appendChild(renderer.domElement);
+}
+
+/**
+ * @Function [二维笛卡尔坐标系]
+ * @return   mull
+ * @DateTime 2017-06-20
+ */
+function redrawCartesian2() {
+  curCoordType = 2;
+  $(".radio-group").show();
+  d3.select("#map").html(null);
+  d3.select("#stats").html(null);
+  startPolling('2d');
+  //scatter.points(points).draw();
+  // 切换选择方式
+  $(".radio").click(function () {
+    scatter.switchZommPan($('input:radio:checked').val()).draw();
+  });
+}
+
+/**
+ * @Function [点击星空]
+ * @param    event
+ * @return   null
+ * @DateTime 2017-06-20
+ */
+function clickMap(event) {
+  if (curCoordType != 1 && curCoordType != 3) return;
+  event.preventDefault();
+  mouse.x = (event.offsetX / width) * 2 - 1,
+    mouse.y = - (event.offsetY / height) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  var result = getIntersectPoint();
+  if (result.index >= 0) {
+    var attributes = pointsSystem[+result.intersect.object.name].geometry.attributes;
+    var INTERSECTED = result.intersect.index;
+    attributes.size.array[INTERSECTED] = attributes.size.array[INTERSECTED] == 10 ? 1 : 10;
+    var color = new THREE.Color();
+    color.setHSL(0.1 * 2, 1, .5);
+    color.toArray(attributes.customColor.array, INTERSECTED * 3);
+
+    attributes.size.needsUpdate = true;
+    attributes.customColor.needsUpdate = true;
+    showStarDetail(pointsBatch[result.index][INTERSECTED]);
+    utils.showQuadrillage(pointsBatch[result.index][INTERSECTED], scene);
+  }
+}
+
+/**
+ * @Function [从批次几何体中获取点击的星星]
+ * @return   { index: number, intersect: THREE.BufferGeometry };
+ * @DateTime 2017-06-20
+ */
+function getIntersectPoint() {
+  for (var i = pointsSystem.length - 1; i >= 0; i--) {
+    var intersects = raycaster.intersectObject(pointsSystem[i]);
+    if (intersects.length > 0) return { index: i, intersect: intersects[0] };
+  }
+  return { index: -1, intersect: null };
+}
+
+/**
+ * @Function [显示星星详情]
+ * @NOTE     函数中用到了所有信息数组points，连线组件line
+ * @param    选中的星星，包含属性有：['x_pix','y_pix','ra','dec','zone','ccd_num','star_id','mag','timestamp','ellipticity','mag']
+ * @return   null
+ * @DateTime 2017-06-18
+ */
+function showStarDetail(d) {
+  // 显示星星信息
+  ['x_pix', 'y_pix', 'ra', 'dec', 'zone', 'ccd_num', 'star_id', 'mag', 'timestamp', 'ellipticity', 'mag'].forEach(function (key) {
+    $('#' + key).text(d[key]);
+  });
+
+  // 显示光变曲线
+  var selected = points.filter(function (f) { return f.star_id == d.star_id; });
+  line.points(selected).draw();
+}
+
+/**
+ * @Function [循环渲染]
+ * @return   null
+ * @DateTime 2017-06-18
+ */
+function render() {
+  stats.update();
+  orbit.update();
+  // earthGroup.rotation.y += 0.003;
+  renderer.render(scene, camera);
+  requestAnimationFrame(render);
+}
+
+/**
+ * @Function [轮询异常星星]
+ * @return   null
+ * @DateTime 2017-06-20
+ */
+function startPolling(type) {
+  exceptionStarInterval = setInterval(function () {
+    d3.request(URL)
+      .mimeType("application/json")
+      .response(function (xhr) {
+        return JSON.parse(xhr.responseText);
+      })
+      .get(function (arr) {
+        arr.forEach(function (d) {
+          d = typePoint(d);
+        })
+	renderNewData(d,type);
+      });
+  }, 1000);
+}
+
+function closePolling() {
+  clearInterval(exceptionStarInterval);
+}
+
+function renderNewData(d, type) {
+  // 模拟数据，从points中随机取出15个点
+  var stars = d3.range(Math.floor(Math.random() * 150)).map(function (d) {
+    return points[Math.floor(Math.random() * points.length)];
+  });
+
+  // 绘制点
+  type == '3d' ? drawEquatorialPoints(stars, earthGroup) : drawScatterPoints(stars);
+}
+
+function drawScatterPoints(points) {
+  // 如果超过阈值则删除
+  if (pointsBatch.length > 20 * 60 * 24) {
+    pointsBatch.shift();
+  }
+  // 上一批次白兰
+  if (pointsBatch.length > 0) {
+    var batch = pointsBatch[pointsBatch.length - 1];
+    for (var i = 0; i < batch.length; i++) {
+      batch[i].new = false;
+    }
+  }
+
+  points.forEach(function (d) { d.new = true; });
+
+  pointsBatch.push(points);
+
+  scatter.points(pointsBatch.reduce((a, b) => a.concat(b))).reDraw();
+}
+
+/**
+ * @Function [动态绘制点，删除过期数据，标颜色等]
+ * @param    点数据
+ * @param    天球几何体分组
+ * @return   null
+ * @DateTime 2017-06-20
+ */
+function drawEquatorialPoints(points, earthGroup) {
+  var positions = new Float32Array(points.length * 3);
+  var colors = new Float32Array(points.length * 3);
+  var sizes = new Float32Array(points.length);
+
+  // 如果超过阈值则删除
+  if (pointsBatch.length > 20 * 60 * 24) {
+    var toDel = pointsSystem.shift();
+    pointsBatch.shift();
+    deletePoints(toDel.name, earthGroup);
+  }
+  // 上一批次白兰
+  if (pointsBatch.length > 0) {
+    var color = new THREE.Color();
+    color.setRGB(0, 255, 255);// 白兰
+    var attributes = pointsSystem[pointsSystem.length - 1].geometry.attributes;
+    for (var i = 0; i < attributes.customColor.array.length; i += 3) {
+      attributes.customColor.array[i] = 0;
+      attributes.customColor.array[i + 1] = 255;
+      attributes.customColor.array[i + 2] = 255;
+      attributes.customColor.needsUpdate = true;
+    }
+  }
+
+  // 当前批次黄色
+  points.forEach(function (d, i) {
+    var color = new THREE.Color();
+    color.setRGB(255, 255, 0);// 黄色
+    var lng = parseFloat(d.ra),// 赤经 
+      lat = parseFloat(d.dec);// 赤纬
+    var vertex = utils.spherical2Cartesian(earthRadius * 3, lat, lng);
+    sizes[i] = 0.03 * d.mag * d.mag;
+    color.toArray(colors, i * 3);
+    vertex.toArray(positions, i * 3);
+  });
+
+  var pointGeom = new THREE.BufferGeometry();
+  pointGeom.addAttribute('customColor', new THREE.BufferAttribute(colors, 3));
+  pointGeom.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+  pointGeom.addAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+  var pointsGeom = new THREE.Points(pointGeom, pointMaterial);
+  pointsGeom.name = batch++;
+  earthGroup.add(pointsGeom);
+  pointsSystem.push(pointsGeom);
+  pointsBatch.push(points);
+}
+
+/**
+ * @Function [从分组中删除几何体]
+ * @param    几何体名称
+ * @param    几何体分组
+ * @return   null
+ * @DateTime 2017-06-20
+ */
+function deletePoints(name, group) {
+  for (var i = 0; i < group.children.length; i++) {
+    if (group.children[i].name === name) {
+      group.children.splice(i, 1);
+    }
+  }
+}

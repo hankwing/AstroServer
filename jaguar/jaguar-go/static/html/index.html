@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>star</title>
+	<link rel="stylesheet" href="../css/bootstrap.css">
+	<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+	<script type="x-shader/x-vertex" id="vertexshader">
+
+		attribute float size;
+		attribute vec3 customColor;
+		varying vec3 vColor;
+		void main() {
+			vColor = customColor;
+			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+			gl_PointSize = size * ( 600.0 / -mvPosition.z );
+			gl_Position = projectionMatrix * mvPosition;
+		}
+	</script>
+
+	<script type="x-shader/x-fragment" id="fragmentshader">
+
+		uniform vec3 color;
+		uniform sampler2D texture;
+		varying vec3 vColor;
+		void main() {
+			gl_FragColor = vec4( color * vColor, 1.0 );
+			gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+			if ( gl_FragColor.a < ALPHATEST ) discard;
+		}
+
+	</script>
+	 
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Astro-Visio</a>
+			</div>
+			<form class="navbar-form navbar-left" role="search" autocomplete="off" onkeydown="if(event.keyCode==13) return false;">
+				<div class="form-group">
+									</div>
+				
+			</form>
+                         <ul class="nav nav-tabs navbar-right">
+				<li ><a href="http://10.0.83.68:8080/monitor">Highest abnormal degree light-curve</a></li>
+			</ul>
+		</div>
+
+	</nav>
+	 
+	<div class="main-panel">
+		<div class="left-panel">
+			<!-- <div class="row"> -->
+				<div class="panel panel-default starry-info">
+			    <div class="panel-heading">Star Information</div>
+			    <div class="panel-body">
+			      <table class="table">
+							<thead>
+							  <tr>
+							     <th>Attribute</th>
+							     <th>Value</th>
+							  </tr>
+							</thead>
+							<tbody>
+								<tr>
+							     <td>Star_id</td>
+							     <td id="star_id"></td>
+							  </tr>
+							  <tr>
+							     <td>Zone</td>
+							     <td id="zone"></td>
+							  </tr>
+							  <tr>
+							     <td>CCD</td>
+							     <td id="ccd_num"></td>
+							  </tr>
+							  <tr>
+							     <td>Ra</td>
+							     <td id="ra"></td>
+							  </tr>
+							  <tr>
+							     <td>Dec</td>
+							     <td id="dec"></td>
+							  </tr>
+							  <tr>
+							     <td>X_pix</td>
+							     <td id="x_pix"></td>
+							  </tr>
+							  <tr>
+							     <td>Y_pix</td>
+							     <td id="y_pix"></td>
+							  </tr>
+							  <tr>
+							     <td>Ellipticity</td>
+							     <td id="ellipticity"></td>
+							  </tr>
+							  
+							  <tr>
+							     <td>Mag</td>
+							     <td id="mag"></td>
+							  </tr>
+							</tbody>
+						</table>
+			    </div>
+				<!-- </div> -->
+			</div>
+		</div>
+		<div class="center-panel">
+			<div class="panel panel-default starry-sky">
+        <ul id="myTab" class="nav nav-tabs">
+					<li class="active"><a href="#equatorial" onclick="draw(this, 1)">Celestial Reference Frame</a></li>
+					<li><a href="#cartesian2" onclick="draw(this, 2)">Descartes coordinate system</a></li>
+					<!-- <li><a href="#cartesian3" onclick="draw(this, 3)">三维笛卡尔坐标系</a></li> -->
+				</ul>
+
+				<div id="myTabContent" class="tab-content">
+					<div class="tab-pane fade in active" id="equatorial">
+						<div id="main">
+							<div id="stats"></div>
+							<div id="map" onmousedown="clickMap(event)"></div>
+						</div>
+					</div>
+				</div>
+	    </div>
+		</div>
+		<div class="right-panel">
+			<div class="panel panel-default light-curve">
+		    <div class="panel-heading">Light-curve</div>
+		    <div class="panel-body">
+		        <div id="light"></div>
+		    </div>
+			</div>
+		</div>
+	</div>
+	<div class="bottom-panel">
+
+	</div>
+	<script src="../js/three.js"></script>
+	<script src="../js/stats.js"></script>
+	<script src="../js/orbit_controls.js"></script>
+	<script src="../js/d3.v4.js"></script>
+	<script src="../js/jquery-3.2.1.js"></script>
+	<script src="../js/bootstrap.js"></script>
+	<script src="../js/scatter.min.js"></script>
+	<script src="../js/line.min.js"></script>
+	<script src="../js/Projector.js"></script>
+	<script src="../js/utils.js"></script>
+	<script src="../js/variables.js"></script>
+	<script src="../js/index.js"></script>
+</body>
+</html>
