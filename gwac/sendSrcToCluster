@@ -2,5 +2,5 @@
 
 for(( worker = 69; worker < 88; worker++)) 
 do
-	scp /home/wamdm/gwac/gwac_dbgen/init_imageid.txt 10.0.83.$worker:~/gwac/gwac_dbgen/
+	scp /home/wamdm/gwac/docker/docker-ce_17.09.0_ce-0_ubuntu_amd64.deb 10.0.83.$worker:~/gwac/docker
 done

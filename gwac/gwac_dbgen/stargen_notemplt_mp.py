@@ -410,8 +410,12 @@ def star_generator(**workparams):
     """
     if not os.path.exists(workparams['templatefile']):
         sys.exit('%s: template file does not exits.' %workparams['templatefile'])
-    if os.path.exists(workparams['destdir']):
-        shutil.rmtree(workparams['destdir'])
+    #if os.path.exists(workparams['destdir']):
+    #    shutil.rmtree(workparams['destdir'])
+    # modified by hankwing 2018/01/10
+    filelist = [ f for f in os.listdir(workparams['destdir']) if f.endswith(".cat") ]
+    for f in filelist:
+        os.remove(os.path.join(workparams['destdir'], f)) 
     if not os.path.exists(workparams['destdir']):
         os.makedirs(workparams['destdir'])
 
